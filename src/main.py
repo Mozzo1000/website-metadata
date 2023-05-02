@@ -27,12 +27,19 @@ class Icon:
             with open(os.path.join(save_dir, filename), "wb") as out_file:
                 return shutil.copyfileobj(response, out_file)
 
+@dataclass
+class ResponseHeader:
+    server: str
+    x_powered_by: str
+
 class Metadata(HTMLParser):
     def __init__(self, url):
         super().__init__()
         self.url = url
         self.icons = []
         self.title = None
+        self.description = None
+        self.respheader = None
 
         self._match_title = False
 
@@ -40,6 +47,7 @@ class Metadata(HTMLParser):
         
         with urllib.request.urlopen(_request) as response:
             html = str(response.read())
+            self.respheader = ResponseHeader(server=response.headers.get("Server"), x_powered_by=response.headers.get("X-Powered-By"))
 
         self.feed(html)
 
@@ -73,6 +81,12 @@ class Metadata(HTMLParser):
         
         if tag == "title":
             self._match_title = True
+        if tag == "meta":
+            for item in attrs:
+                if "description" in item:
+                    for item2 in attrs:
+                        if "content" in item2:
+                            self.description = item2[1]
 
     def handle_data(self, data):
         if self._match_title:
