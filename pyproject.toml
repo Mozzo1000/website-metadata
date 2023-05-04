@@ -1,0 +1,22 @@
+[project]
+name = "website_metadata"
+version = "0.1.0"
+authors = [
+  { name="Andreas Backström", email="mozzo242@gmail.com" },
+]
+description = "Library for reliably retrieving metadata from websites"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Mozzo1000/website-metadata"
+"Bug Tracker" = "https://github.com/Mozzo1000/website-metadata/issues"
+
+[build-system]
+requires = ["setuptools==67.7.2"]
+build-backend = "setuptools.build_meta"
