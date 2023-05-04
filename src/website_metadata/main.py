@@ -111,8 +111,12 @@ class Metadata(HTMLParser):
                         if "href" in item2:
                             for item3 in attrs:
                                 if "sizes" in item3:
-                                    width = item3[1].split("x")[0]
-                                    height = item3[1].split("x")[1]
+                                    if item3[1] == "any":
+                                        width = 0
+                                        height = 0
+                                    else:
+                                        width = item3[1].split("x")[0]
+                                        height = item3[1].split("x")[1]
                             self.icons.append(Icon(self.url + item2[1], width, height))
         
         if tag == "title":
