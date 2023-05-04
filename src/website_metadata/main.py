@@ -4,7 +4,8 @@ import urllib.request
 import urllib.parse
 import os
 import shutil
-from decorators import require_icons
+from website_metadata.decorators import require_icons
+from urllib.error import URLError, HTTPError
 
 HEADERS = {'User-Agent': 'Mozilla/5.0'}
 
@@ -40,19 +41,54 @@ class Metadata(HTMLParser):
         self.title = None
         self.description = None
         self.respheader = None
+        self.raw_respheader = None
+        self.raw_html = None
+        self.robots = self.get_robots()
+        self.sitemap = self.get_sitemap()
+        self.humans = self.get_humans()
 
         self._match_title = False
 
         _request = urllib.request.Request(self.url, headers=HEADERS)
         
         with urllib.request.urlopen(_request) as response:
-            html = str(response.read())
+            self.raw_html = str(response.read())
             self.respheader = ResponseHeader(server=response.headers.get("Server"), x_powered_by=response.headers.get("X-Powered-By"))
+            self.raw_respheader = response.headers
 
-        self.feed(html)
+        self.feed(self.raw_html)
+
+
+    def get_robots(self):
+        _request = urllib.request.Request(urllib.parse.urljoin(self.url, "robots.txt"), headers=HEADERS)
+        try:
+            with urllib.request.urlopen(_request) as response:
+                return response.read()
+        except HTTPError as error:
+            if error.code == 404:
+                return None
+    
+    def get_sitemap(self):
+        _request = urllib.request.Request(urllib.parse.urljoin(self.url, "sitemap.xml"), headers=HEADERS)
+        try:
+            with urllib.request.urlopen(_request) as response:
+                return response.read()
+        except HTTPError as error:
+            if error.code == 404:
+                return None
+    
+    def get_humans(self):
+        _request = urllib.request.Request(urllib.parse.urljoin(self.url, "humans.txt"), headers=HEADERS)
+        try:
+            with urllib.request.urlopen(_request) as response:
+                return response.read()
+        except HTTPError as error:
+            if error.code == 404:
+                return None
+
 
     @require_icons
-    def best(self):
+    def best_icon(self):
         resolution = {}
         for icon in self.icons:
             if int(icon.width) > 0 and int(icon.height) > 0:
