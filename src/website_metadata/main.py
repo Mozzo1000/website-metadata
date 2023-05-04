@@ -43,6 +43,8 @@ class Metadata(HTMLParser):
         self.respheader = None
         self.raw_respheader = None
         self.raw_html = None
+        self.status = None
+
         self.robots = self.get_robots()
         self.sitemap = self.get_sitemap()
         self.humans = self.get_humans()
@@ -51,12 +53,15 @@ class Metadata(HTMLParser):
 
         _request = urllib.request.Request(self.url, headers=HEADERS)
         
-        with urllib.request.urlopen(_request) as response:
-            self.raw_html = str(response.read())
-            self.respheader = ResponseHeader(server=response.headers.get("Server"), x_powered_by=response.headers.get("X-Powered-By"))
-            self.raw_respheader = response.headers
-
-        self.feed(self.raw_html)
+        try:
+            with urllib.request.urlopen(_request, timeout=10) as response:
+                self.raw_html = str(response.read())
+                self.respheader = ResponseHeader(server=response.headers.get("Server"), x_powered_by=response.headers.get("X-Powered-By"))
+                self.raw_respheader = response.headers
+                self.status = response.status
+            self.feed(self.raw_html)
+        except HTTPError as error:
+            self.status = error.code
 
 
     def get_robots(self):
