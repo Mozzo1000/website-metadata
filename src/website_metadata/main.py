@@ -62,6 +62,8 @@ class Metadata(HTMLParser):
             self.feed(self.raw_html)
         except HTTPError as error:
             self.status = error.code
+        except TimeoutError:
+            self.status = 408
 
 
     def get_robots(self):
