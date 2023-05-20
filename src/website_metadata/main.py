@@ -152,10 +152,13 @@ class Metadata(HTMLParser):
                                     else:
                                         width = item3[1].split("x")[0]
                                         height = item3[1].split("x")[1]
+
                             if is_valid_url(item2[1]):
                                 self.icons.append(Icon(item2[1], width, height))
                             elif item2[1].startswith("data:"):
                                 self.icons.append(Icon(item2[1], width, height))
+                            elif item2[1].startswith("//"):
+                                self.icons.append(Icon(item2[1][2:], width, height))
                             else:
                                 self.icons.append(Icon(self.url + item2[1], width, height))
         
