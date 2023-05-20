@@ -9,6 +9,13 @@ from urllib.error import URLError, HTTPError
 
 HEADERS = {'User-Agent': 'Mozilla/5.0'}
 
+def is_valid_url(url):
+    try:
+        result = urllib.parse.urlparse(url)
+        return all([result.scheme, result.netloc])
+    except:
+        return False
+
 @dataclass
 class Icon:
     url: str
@@ -132,7 +139,10 @@ class Metadata(HTMLParser):
                                     else:
                                         width = item3[1].split("x")[0]
                                         height = item3[1].split("x")[1]
-                            self.icons.append(Icon(self.url + item2[1], width, height))
+                            if is_valid_url(item2[1]):
+                                self.icons.append(Icon(item2[1], width, height))
+                            else:
+                                self.icons.append(Icon(self.url + item2[1], width, height))
         
         if tag == "title":
             self._match_title = True
