@@ -63,6 +63,7 @@ class Metadata(HTMLParser):
             self.feed(self.raw_html)
         except HTTPError as error:
             self.status = error.code
+            self.raw_respheader = error.headers
         except TimeoutError:
             self.status = 408
 
