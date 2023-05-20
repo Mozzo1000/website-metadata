@@ -6,6 +6,7 @@ import os
 import shutil
 from website_metadata.decorators import require_icons
 from urllib.error import URLError, HTTPError
+import uuid
 
 HEADERS = {'User-Agent': 'Mozilla/5.0'}
 
@@ -23,8 +24,12 @@ class Icon:
     height: int = 0
 
     def save(self, output=""):
-        parsed_url = urllib.parse.urlparse(self.url)
-        save_dir = os.path.join(output, parsed_url.hostname)
+        parsed_url = urllib.parse.urlparse(self.url)        
+        if parsed_url.hostname:
+            hostname = parsed_url.hostname
+        else:
+            hostname = uuid.uuid4().hex
+        save_dir = os.path.join(output, hostname)
         filename = os.path.basename(parsed_url.path)
 
         if save_dir.endswith("."):
@@ -148,6 +153,8 @@ class Metadata(HTMLParser):
                                         width = item3[1].split("x")[0]
                                         height = item3[1].split("x")[1]
                             if is_valid_url(item2[1]):
+                                self.icons.append(Icon(item2[1], width, height))
+                            elif item2[1].startswith("data:"):
                                 self.icons.append(Icon(item2[1], width, height))
                             else:
                                 self.icons.append(Icon(self.url + item2[1], width, height))
