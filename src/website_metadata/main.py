@@ -158,7 +158,7 @@ class Metadata(HTMLParser):
                             elif item2[1].startswith("data:"):
                                 self.icons.append(Icon(item2[1], width, height))
                             elif item2[1].startswith("//"):
-                                self.icons.append(Icon(item2[1][2:], width, height))
+                                self.icons.append(Icon("https://" + item2[1][2:], width, height))
                             else:
                                 self.icons.append(Icon(self.url + item2[1], width, height))
         
