@@ -22,18 +22,26 @@ class Icon:
     width: int = 0
     height: int = 0
 
-    def save(self):
+    def save(self, output=""):
         parsed_url = urllib.parse.urlparse(self.url)
-        save_dir = parsed_url.hostname
+        save_dir = os.path.join(output, parsed_url.hostname)
         filename = os.path.basename(parsed_url.path)
-        
+
+        if save_dir.endswith("."):
+            save_dir = save_dir[:-1]
+
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
         
         _request = urllib.request.Request(self.url, headers=HEADERS)
-        with urllib.request.urlopen(_request) as response:
-            with open(os.path.join(save_dir, filename), "wb") as out_file:
-                return shutil.copyfileobj(response, out_file)
+        try:
+            with urllib.request.urlopen(_request) as response:
+                with open(os.path.join(save_dir, filename), "wb") as out_file:
+                    return shutil.copyfileobj(response, out_file)
+        except URLError as error:
+            print("Unable to save file")
+            return None
+            
 
 @dataclass
 class ResponseHeader:
