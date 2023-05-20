@@ -44,6 +44,7 @@ class Metadata(HTMLParser):
         self.raw_respheader = None
         self.raw_html = None
         self.status = None
+        self.language = None
 
         self.robots = self.get_robots()
         self.sitemap = self.get_sitemap()
@@ -111,6 +112,12 @@ class Metadata(HTMLParser):
         # Only parse the 'link' tag.
         width = 0
         height = 0
+
+        if tag == "html":
+            for item in attrs:
+                if "lang" in item:
+                    self.language = item[1]
+
         if tag == "link":
             for item in attrs:
                 if "rel" and "icon" in item:
