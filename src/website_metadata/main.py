@@ -76,7 +76,7 @@ class Metadata(HTMLParser):
         
         try:
             with urllib.request.urlopen(_request, timeout=10) as response:
-                self.raw_html = str(response.read())
+                self.raw_html = str(response.read().decode("utf-8"))
                 self.respheader = ResponseHeader(server=response.headers.get("Server"), x_powered_by=response.headers.get("X-Powered-By"))
                 self.raw_respheader = response.headers
                 self.status = response.status
