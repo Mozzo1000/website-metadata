@@ -7,6 +7,7 @@ import shutil
 from website_metadata.decorators import require_icons
 from urllib.error import URLError, HTTPError
 import uuid
+import gzip
 
 HEADERS = {'User-Agent': 'Mozilla/5.0'}
 
@@ -76,7 +77,11 @@ class Metadata(HTMLParser):
         
         try:
             with urllib.request.urlopen(_request, timeout=10) as response:
-                self.raw_html = str(response.read().decode("utf-8"))
+                try:
+                    self.raw_html = str(response.read().decode("utf-8"))
+                except UnicodeDecodeError:
+                    content = gzip.decompress(response.read())
+                    self.raw_html = str(content)
                 self.respheader = ResponseHeader(server=response.headers.get("Server"), x_powered_by=response.headers.get("X-Powered-By"))
                 self.raw_respheader = response.headers
                 self.status = response.status
@@ -160,7 +165,6 @@ class Metadata(HTMLParser):
                                     else:
                                         width = item3[1].split("x")[0]
                                         height = item3[1].split("x")[1]
-
                             if is_valid_url(item2[1]):
                                 self.icons.append(Icon(item2[1], width, height))
                             elif item2[1].startswith("data:"):
