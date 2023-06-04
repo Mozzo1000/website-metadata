@@ -86,6 +86,8 @@ class Metadata(HTMLParser):
             self.raw_respheader = error.headers
         except TimeoutError:
             self.status = 408
+        except URLError:
+            self.status = 400
 
 
     def get_robots(self):
@@ -96,6 +98,8 @@ class Metadata(HTMLParser):
         except HTTPError as error:
             if error.code == 404:
                 return None
+        except URLError:
+            return None
     
     def get_sitemap(self):
         _request = urllib.request.Request(urllib.parse.urljoin(self.url, "sitemap.xml"), headers=HEADERS)
@@ -105,6 +109,8 @@ class Metadata(HTMLParser):
         except HTTPError as error:
             if error.code == 404:
                 return None
+        except URLError:
+            return None
     
     def get_humans(self):
         _request = urllib.request.Request(urllib.parse.urljoin(self.url, "humans.txt"), headers=HEADERS)
@@ -114,6 +120,8 @@ class Metadata(HTMLParser):
         except HTTPError as error:
             if error.code == 404:
                 return None
+        except URLError:
+            return None
 
 
     @require_icons
